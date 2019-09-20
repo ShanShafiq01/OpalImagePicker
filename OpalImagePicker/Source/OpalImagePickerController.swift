@@ -113,7 +113,15 @@ open class OpalImagePickerController: UINavigationController {
             rootVC?.maximumSelectionsAllowed = maximumSelectionsAllowed
         }
     }
-    
+	
+	/// Already selected photos.
+	@objc open var alreadySelected: Int = 0 {
+		didSet {
+			let rootVC = viewControllers.first as? OpalImagePickerRootViewController
+			rootVC?.alreadySelected = alreadySelected
+		}
+	}
+	
     /// Allowed Media Types that can be fetched. See `PHAssetMediaType`
     open var allowedMediaTypes: Set<PHAssetMediaType>? {
         didSet {

@@ -83,6 +83,10 @@ open class OpalImagePickerRootViewController: UIViewController {
     
     /// Maximum photo selections allowed in picker (zero or fewer means unlimited).
     open var maximumSelectionsAllowed: Int = -1
+	
+	/// Already Selected Photos
+	open var alreadySelected: Int = 0
+
     
     /// Page size for paging through the Photo Assets in the Photo Library. Defaults to 100. Must override to change this value. Only works in iOS 9.0+
     public let pageSize = 100
@@ -284,7 +288,12 @@ open class OpalImagePickerRootViewController: UIViewController {
             cancelTapped()
             return
         }
-        
+		
+		let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(style: .gray)
+		let refreshBarButton: UIBarButtonItem = UIBarButtonItem(customView: activityIndicator)
+		self.navigationItem.rightBarButtonItem = refreshBarButton
+		activityIndicator.startAnimating()
+		
         var photoAssets: [PHAsset] = []
         for indexPath in indexPathsForSelectedItems {
             guard indexPath.item < self.photoAssets.count else { continue }
@@ -447,7 +456,7 @@ extension OpalImagePickerRootViewController: UICollectionViewDelegate {
         let collectionViewItems = self.collectionView?.indexPathsForSelectedItems?.count ?? 0
         let externalCollectionViewItems = self.externalCollectionView?.indexPathsForSelectedItems?.count ?? 0
         
-        if maximumSelectionsAllowed <= collectionViewItems + externalCollectionViewItems {
+        if maximumSelectionsAllowed <= (collectionViewItems + externalCollectionViewItems + alreadySelected) {
             //We exceeded maximum allowed, so alert user. Don't allow selection
             let message = configuration?.maximumSelectionsAllowedMessage ?? NSLocalizedString("You cannot select more than \(maximumSelectionsAllowed) images. Please deselect another image before trying to select again.", comment: "You cannot select more than (x) images. Please deselect another image before trying to select again. (OpalImagePicker)")
             let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
